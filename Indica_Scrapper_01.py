@@ -25,6 +25,7 @@ try:
 except:
     print("Failed to search Ethos...")
 
-
+print("------------------------------------------------------------------------")
 print("In stock at Ascend: %s" % found_at_ascend)
 print("In stock at Ethos: %s" % found_at_ethos)
+print("------------------------------------------------------------------------")
