@@ -7,6 +7,23 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import re
 
+#extract price, size, and brand
+def extract_element_values(ele):
+    pr, si, br = "N/A"
+    price = re.findall(r"\$[0-9]?[0-9]?[0-9]\.?[0-9]?[0-9]?", ele)
+    if price:
+        pr = price[0]
+        
+    size = re.findall(r"[0-9]?[0-9].?[0-9][0-9]?g", ele)
+    if size:
+        si = size[0]
+        
+    brand = re.findall(r'<div class="sc-35f5af31-0 cduLoD">(.+)' ,ele)
+    if brand:
+        br = brand[0][0:brand[0].find('</div>')] #cuts at first div marker
+    
+    return pr, si, br
+
 #return i = -1 if element found
 #if found returns, price, size, and brand in that order
 def check_for_element(driver, search_key, max_elements_checked):
@@ -17,10 +34,7 @@ def check_for_element(driver, search_key, max_elements_checked):
         ele = i.get_attribute("innerHTML")
         if(ele.find(search_key) != -1):
             print("Found at %s" % num)
-            price = re.findall(r"\$[0-9]?[0-9]?[0-9]\.?[0-9]?[0-9]?", ele)[0]
-            size = re.findall(r"[0-9]?[0-9].?[0-9][0-9]?g", ele)[0]
-            brand = re.findall(r'<div class="sc-35f5af31-0 cduLoD">(.+)' ,ele)[0]
-            brand = brand[0:brand.find('</div>')] #cuts at first div marker
+            price, size, brand = extract_element_values(ele)
             return True, price, size, brand
         else:
             num += 1
@@ -55,11 +69,16 @@ def open_web_driver(url):
 
 #if found returns {found status}, price, size, and brand
 def sel_ascend_run(search_key, url, max_scrolls_to_bottom,max_elements_checked,wait_for_load_time):
+    returned_items = []
+
     driver = open_web_driver(url)
     bypass_age_check(driver)
     traverse_page(driver, max_scrolls_to_bottom, wait_for_load_time)
-    found, price, size, brand = check_for_element(driver, search_key, max_elements_checked)	
+    i = 0
+    while i < len(search_key):
+        returned_items.append(check_for_element(driver, search_key[i], max_elements_checked))
+        i += 1
     driver.close()
-    return found, price, size, brand
+    return returned_items
     
-#sel_ascend_run("Alien OG", "https://letsascend.com/menu/pa-scranton-menu-med/categories/flower", 30, 300, .05)
+#sel_ascend_run(["Cream", "Jupiter #3"], "https://letsascend.com/menu/pa-scranton-menu-med/categories/flower", 30, 300, .1)
