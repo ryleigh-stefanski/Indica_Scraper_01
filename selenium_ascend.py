@@ -25,8 +25,10 @@ def extract_element_values(ele):
     return pr, si, br
 
 #return i = -1 if element found
-#if found returns, price, size, and brand in that order
+#returns a list of items matching the name
+#list elements look like this [search_key, (price, size, brand)]
 def check_for_element(driver, search_key, max_elements_checked):
+    return_items = []
     items = driver.find_elements(By.CSS_SELECTOR, '[class="sc-6ef47149-0 hVgJPP"]')
     num = 0;
     for i in items:
@@ -34,11 +36,10 @@ def check_for_element(driver, search_key, max_elements_checked):
         ele = i.get_attribute("innerHTML")
         if(ele.find(search_key) != -1):
             print("Found at %s" % num)
-            price, size, brand = extract_element_values(ele)
-            return True, price, size, brand
+            return_items.append(extract_element_values(ele))
         else:
             num += 1
-    return False
+    return return_items
 
 def traverse_page(driver, max_scrolls_to_bottom, wait_for_load_time):
     #load all elements
@@ -67,7 +68,7 @@ def open_web_driver(url):
         print("Failed")
     return driver
 
-#if found returns {found status}, price, size, and brand
+#if found returns {found status},  price, size, and brand
 def sel_ascend_run(search_key, url, max_scrolls_to_bottom,max_elements_checked,wait_for_load_time):
     returned_items = []
 
@@ -81,4 +82,4 @@ def sel_ascend_run(search_key, url, max_scrolls_to_bottom,max_elements_checked,w
     driver.close()
     return returned_items
     
-#sel_ascend_run(["Cream", "Jupiter #3"], "https://letsascend.com/menu/pa-scranton-menu-med/categories/flower", 30, 300, .1)
+#print(sel_ascend_run(["Cream", "Jupiter #3"], "https://letsascend.com/menu/pa-scranton-menu-med/categories/flower", 30, 300, .1))
