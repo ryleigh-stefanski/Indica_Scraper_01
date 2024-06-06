@@ -27,8 +27,8 @@ def extract_element_values(ele):
 #searches the items list for all items in the search_key list
 def search_page_elements(search_key, items):
     found_items = []
-    pos = 0
     for key in search_key:
+        pos = 0
         for i in items:
             print("Checking %s / %s items on this page for key %s..." % (pos, len(items), key))
             ele = i.get_attribute("innerHTML")
